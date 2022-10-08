@@ -21,7 +21,12 @@ app.get("/", (req, res) => {
             id: 3,
             name: "Go out",
             done: true
-        }
+        },
+        {
+            id: 4,
+            name: "Testing",
+            done: true
+        },
     ])
 })
 
