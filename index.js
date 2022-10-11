@@ -52,11 +52,7 @@ app.get("/", (req, res) => {
             name: "Testing 6",
             done: true
         },
-        {
-            id: 10,
-            name: "Testing 7",
-            done: true
-        },
+        
     ])
 })
 
