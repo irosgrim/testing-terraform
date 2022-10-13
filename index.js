@@ -5,59 +5,45 @@ const cors = require("cors");
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.get("/", (req, res) => {
+app.get("/list", (req, res) => {
     res.send([
         {
             id: 1,
-            name: "Hello world",
+            title: "Buy a Billy",
             done: false
         },
         {
             id: 2,
-            name: "Buy milk",
+            title: "Buy a zebra pattern rug",
             done: false
         },
         {
             id: 3,
-            name: "Go out",
-            done: true
-        },
-        {
-            id: 4,
-            name: "Testing",
-            done: true
-        },
-        {
-            id: 5,
-            name: "Testing 2",
-            done: true
-        },
-        {
-            id: 6,
-            name: "Testing 3",
-            done: true
-        },
-        {
-            id: 7,
-            name: "Testing 4",
-            done: true
-        },
-        {
-            id: 8,
-            name: "Testing 5",
-            done: true
-        },
-        {
-            id: 9,
-            name: "Testing 6",
-            done: true
-        },
-        {
-            id: 9,
-            name: "Testing 6",
+            title: "Eat some köttbullar",
             done: true
         },
     ])
+})
+
+app.get("/list-db", (req, res) => {
+    res.status(404).send();
+    // res.send([
+    //     {
+    //         id: 1,
+    //         title: "Buy a Billy",
+    //         done: false
+    //     },
+    //     {
+    //         id: 2,
+    //         title: "Buy a zebra pattern rug",
+    //         done: false
+    //     },
+    //     {
+    //         id: 3,
+    //         title: "Eat some köttbullar",
+    //         done: true
+    //     },
+    // ])
 })
 
 app.listen(PORT, () => console.log("Server is running on port ", PORT))
