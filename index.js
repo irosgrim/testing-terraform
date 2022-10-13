@@ -27,6 +27,7 @@ app.get("/list", (req, res) => {
 
 app.get("/list-db", (req, res) => {
     res.status(404).send();
+    
     // res.send([
     //     {
     //         id: 1,
