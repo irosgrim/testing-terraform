@@ -1,6 +1,7 @@
-const express = require("express");
-const app = express();
+import express from "express";
+import { wsServer } from "./ws";
 
+const app = express();
 const cors = require("cors");
 const PORT = process.env.PORT || 3000;
 
@@ -47,4 +48,11 @@ app.get("/list-db", (req, res) => {
     // ])
 })
 
-app.listen(PORT, () => console.log("Server is running on port ", PORT))
+const server = app.listen(PORT, () => console.log("Server is running on port ", PORT));
+
+// START websocket server
+server.on('upgrade', (request, socket, head) => {
+  wsServer.handleUpgrade(request, socket, head, socket => {
+    wsServer.emit('connection', socket, request);
+  });
+});
