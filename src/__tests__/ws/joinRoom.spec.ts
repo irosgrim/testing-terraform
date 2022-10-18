@@ -1,5 +1,4 @@
-import { WS_MESSAGE_TYPE } from "../../../temp/compiled/src_types_index_ts_224a8ddd1b4ed1acfe203a8785c49534e475d93f3e0a957bb995f31947950f07"
-import { MessageParams, Rooms } from "../../types"
+import { MessageParams, Rooms, WS_MESSAGE_TYPE } from "../../types"
 import { joinRoom } from "../../ws/ws"
 import { socket } from "../../__mocks__/mocks"
 
