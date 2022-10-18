@@ -1,14 +1,16 @@
 import { ClientList, CustomWSClient, MessageParams, Rooms, WSError, WSMessage, WS_MESSAGE_TYPE, Results } from "../types";
 
-let rooms: Rooms = {};
-const users = [];
+export let ROOMS: Rooms = {};
+export const users = [];
 
 const ADMIN_USERNAME = "ADMIN";
 const oldQuestions = {};
 let clientId = 0;
 
-
-export const sendListOfUsersThatVoteToNewUser = (roomId: string, client: CustomWSClient) => {
+export const testRooms = () => {
+    return ROOMS;
+}
+export const sendListOfUsersThatVoteToNewUser = (roomId: string, client: CustomWSClient, rooms = ROOMS) => {
     const whoVoted: WSMessage = {
         type: WS_MESSAGE_TYPE.NEW_VOTE,
         params: {
@@ -18,7 +20,7 @@ export const sendListOfUsersThatVoteToNewUser = (roomId: string, client: CustomW
     client.send(JSON.stringify(whoVoted));
 }
 
-export const broadcastListOfUsersThatVote = (roomId: string) => {
+export const broadcastListOfUsersThatVote = (roomId: string, rooms = ROOMS) => {
     const whoVoted: WSMessage = {
         type: WS_MESSAGE_TYPE.NEW_VOTE,
         params: {
@@ -33,7 +35,7 @@ export const broadcastListOfUsersThatVote = (roomId: string) => {
     });
 }
 
-export const disconnectAllSockets = (roomId: string) => {
+export const disconnectAllSockets = (roomId: string, rooms = ROOMS) => {
     rooms[roomId].clients.forEach((client) =>{
         client.send(JSON.stringify({
             type: WS_MESSAGE_TYPE.SERVER_CLOSED
@@ -49,10 +51,10 @@ export const broadcastResults = (socket: CustomWSClient) => {
         const showResults: Results = {
             type: WS_MESSAGE_TYPE.RESULTS,
             params: {
-                data: rooms[roomId].questions.options
+                data: ROOMS[roomId].questions.options
             }
         }
-        rooms[roomId].clients.forEach((client) =>{
+        ROOMS[roomId].clients.forEach((client) =>{
             if (!client.isAdmin) {
                 client.send(JSON.stringify(showResults));
             }
@@ -60,7 +62,7 @@ export const broadcastResults = (socket: CustomWSClient) => {
     }
 }
 
-export const broadcastListOfClients = (roomId: string) => {
+export const broadcastListOfClients = (roomId: string, rooms = ROOMS) => {
     const clients: ClientList = {
         type: WS_MESSAGE_TYPE.CLIENTS,
         params: {
@@ -83,7 +85,7 @@ export const sendRoomExists = (socket) => {
     socket.send(JSON.stringify(err))
 }
 
-export const createRoom = (params: MessageParams, socket: CustomWSClient) => {
+export const createRoom = (params: MessageParams, socket: CustomWSClient, rooms = ROOMS) => {
     const { roomId } = params;
     if (!roomId) {
         const err: WSError = {
@@ -124,7 +126,7 @@ export const createRoom = (params: MessageParams, socket: CustomWSClient) => {
     rooms[roomId].questions = params.data;
 }
 
-export const joinRoom = (params: (WSMessage["params"]), socket:CustomWSClient) => {
+export const joinRoom = (params: MessageParams, socket: CustomWSClient, rooms = ROOMS) => {
     const { roomId } = params as MessageParams;
 
     if (!rooms[roomId] || !roomId) {
@@ -164,14 +166,13 @@ export const joinRoom = (params: (WSMessage["params"]), socket:CustomWSClient) =
     }
 
     socket.send(JSON.stringify(questions));
-    broadcastListOfClients(roomId);
-    sendListOfUsersThatVoteToNewUser(roomId, socket);
+    broadcastListOfClients(roomId, rooms);
+    sendListOfUsersThatVoteToNewUser(roomId, socket, rooms);
 }
 
-export const leaveRoom = (socket:CustomWSClient) => {
+export const leaveRoom = (socket: CustomWSClient, rooms = ROOMS) => {
     const isAdmin = socket.isAdmin;
     const roomId = socket.roomId;
-    const clientId = socket.clientId;
     if (rooms[roomId]) {
         const filteredClients = rooms[roomId].clients.filter(client => client.clientId !== socket.clientId);
         rooms[roomId].clients = filteredClients;
@@ -180,7 +181,7 @@ export const leaveRoom = (socket:CustomWSClient) => {
             users.splice(userIndex, 1);
         }
 
-        broadcastListOfClients(roomId);
+        broadcastListOfClients(roomId, rooms);
 
         if (isAdmin) {
             disconnectAllSockets(roomId)
@@ -189,7 +190,7 @@ export const leaveRoom = (socket:CustomWSClient) => {
     }
 }
 
-export const sendMessageToAdmin = (message: WSMessage, roomId: string) => {
+export const sendMessageToAdmin = (message: WSMessage, roomId: string, rooms = ROOMS) => {
     const adminSocketIndex = rooms[roomId].clients.findIndex(x => x.username === ADMIN_USERNAME);
 
     if (adminSocketIndex > -1) {
@@ -198,7 +199,7 @@ export const sendMessageToAdmin = (message: WSMessage, roomId: string) => {
     }
 }
 
-export const vote = (params, socket) => {
+export const vote = (params, socket, rooms = ROOMS) => {
     const {username, roomId} = socket;
 
     // user can only vote once. Remove any previous vote from the same user
@@ -210,7 +211,9 @@ export const vote = (params, socket) => {
         }
     }
 
-    rooms[roomId].questions.options[params.choice].votes.push(username);
+    const numberOfChoices = rooms[roomId].questions.options.length - 1;
+    const choice = (params.choice >= 0 && params.choice <= numberOfChoices) ? params.choice : 0;
+    rooms[roomId].questions.options[choice].votes.push(username);
     
     const privateVotes: WSMessage = {
         type: WS_MESSAGE_TYPE.NEW_VOTE,
@@ -219,8 +222,8 @@ export const vote = (params, socket) => {
         }
     }
 
-    sendMessageToAdmin(privateVotes, roomId);
-    broadcastListOfUsersThatVote(roomId);
+    sendMessageToAdmin(privateVotes, roomId, rooms);
+    broadcastListOfUsersThatVote(roomId, rooms);
 }
 
 export const broadcastNewQuestion = (roomId: string) => {
@@ -230,11 +233,11 @@ export const broadcastNewQuestion = (roomId: string) => {
             username: null,
             roomId: roomId,
             message: null,
-            data: rooms[roomId].questions,
+            data: ROOMS[roomId].questions,
         }
     }
 
-    rooms[roomId].clients.forEach((client) =>{
+    ROOMS[roomId].clients.forEach((client) =>{
         if (!client.isAdmin) {
             client.send(JSON.stringify(questions));
         }
@@ -255,7 +258,7 @@ export const newQuestion = (params: MessageParams, socket: CustomWSClient) => {
             return x;
         });
         params.data.options = choiceMapping;
-        rooms[roomId].questions = params.data;
+        ROOMS[roomId].questions = params.data;
         broadcastNewQuestion(roomId);
         // socket.send(JSON.stringify(oldQuestions[roomId]));
     }

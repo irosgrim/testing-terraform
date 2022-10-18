@@ -53,6 +53,7 @@ export enum WS_MESSAGE_TYPE {
     SERVER_CLOSED = "server-closed",
     NEW_QUESTION = "new-question",
     SET_NEW_QUESTION = "set-new-question",
+    INCORRECT_API_KEY = "incorrect-api-key",
 }
 
 export type SimpleMessage = {
