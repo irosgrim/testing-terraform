@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --cache-directory ./temp src",
     "start": "node index.js",
-    "test": "jest --collect-coverage --verbose"
+    "test": "jest --collect-coverage --verbose",
+    "build": "tsc --build",
+    "clean": "tsc --build --clean"
   },
   "author": "",
   "license": "ISC",
