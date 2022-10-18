@@ -29,9 +29,6 @@ jobs:
 
         - id: tests
           name: Run tests
-          # uses: actions/setup-node@v1
-          with:
-            node-version: ${{ matrix.node-version }}
           run: |
             echo "Unit Tests are running..."
             npm ci
