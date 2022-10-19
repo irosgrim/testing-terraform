@@ -1,3 +1,5 @@
+import { Request } from "express";
+import DB from "../db";
 export interface CustomWSClient extends WebSocket{
     clientId: number;
     username: string | number | null;
