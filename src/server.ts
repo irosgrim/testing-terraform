@@ -12,7 +12,7 @@ const server = () => {
     app.use(auth);
     
     app.use("/list", list)
-    app.use("/list-db", listDb);
+    // app.use("/list-db", listDb);
     app.use("/throw-error", throwError)
 
     return app;
