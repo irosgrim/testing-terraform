@@ -67,8 +67,7 @@ describe("websocket: create room", () => {
                 message: "No room id provided",
             }
         }
-        // expect(socket.send).toBeCalledWith(JSON.stringify(errorMessage));
-        expect(1).toBe(2);
+        expect(socket.send).toBeCalledWith(JSON.stringify(errorMessage));
 
     })
     
